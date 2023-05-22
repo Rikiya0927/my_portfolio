@@ -1,91 +1,76 @@
-// loading画面を表示する
-function showLoadingScreen() {
-    document.getElementById("load").style.display = "flex";
-}
-
-// // fade画面を表示する
-// function showLoadingFadeScreen() {
-//     document.getElementById("fadeout").style.display = "flex";
-// }
+function Ticker( elem ) {
+    elem.lettering();
+    this.done = false;
+    this.cycleCount = 5;
+    this.cycleCurrent = 0;
+    this.chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()-_=+{}|[]\\;\':"<>?,./`~'.split('');
+    this.charsCount = this.chars.length;
+    this.letters = elem.find( 'span' );
+    this.letterCount = this.letters.length;
+    this.letterCurrent = 0;
   
-// loading画面を非表示にする
-function hideLoadingScreen() {
-    document.getElementById("load").style.display = "none";
+    this.letters.each( function() {
+      var $this = $( this );
+      $this.attr( 'data-orig', $this.text() );
+      $this.text( '-' );
+    });
 }
-
-// ページの読み込みが完了したらloading画面を非表示にする
-window.addEventListener("load", function() {
-    // 2.5秒後にloading画面を非表示にする
-    setTimeout(function() {
-        // showLoadingFadeScreen();
-        hideLoadingScreen();
-    }, 2500);
+  
+Ticker.prototype.getChar = function() {
+    return this.chars[ Math.floor( Math.random() * this.charsCount ) ];
+};
+  
+Ticker.prototype.reset = function() {
+    this.done = false;
+    this.cycleCurrent = 0;
+    this.letterCurrent = 0;
+    this.letters.each( function() {
+      var $this = $( this );
+      $this.text( $this.attr( 'data-orig' ) );
+      $this.removeClass( 'done' );
+    });
+    this.loop();
+};
+  
+Ticker.prototype.loop = function() {
+    var self = this;
+  
+    this.letters.each( function( index, elem ) {
+      var $elem = $( elem );
+      if( index >= self.letterCurrent ) {
+        if( $elem.text() !== ' ' ) {
+          $elem.text( self.getChar() );
+          $elem.css( 'opacity', Math.random() );
+        }
+      }
+    });
+  
+    if( this.cycleCurrent < this.cycleCount ) {
+      this.cycleCurrent++;
+    } else if( this.letterCurrent < this.letterCount ) {
+      var currLetter = this.letters.eq( this.letterCurrent );
+      this.cycleCurrent = 0;
+      currLetter.text( currLetter.attr( 'data-orig' ) ).css( 'opacity', 1 ).addClass( 'done' );
+      this.letterCurrent++;
+    } else {
+      this.done = true;
+    }
+  
+    if( !this.done ) {
+      requestAnimationFrame( function() {
+        self.loop();
+      });
+    } else {
+      setTimeout( function() {
+        self.reset();
+      }, 750 );
+    }
+};
+  
+$words = $( '.word' );
+  
+$words.each( function() {
+    var $this = $( this ),
+      ticker = new Ticker( $this ).reset();
+    $this.data( 'ticker', ticker  );
 });
-
-// // ページの読み込みが完了したらloading画面を非表示にする
-// window.addEventListener("load", function() {
-//     // 2.5秒後にloading画面を非表示にする
-//     setTimeout(function() {
-//       showLoadingFadeScreen();
-//       setTimeout(function() {
-//         hideLoadingScreen();
-//       }, 1000); // fade画面が表示されてから1秒後にloading画面を非表示にする
-//     }, 2500);
-//   });
-
-// // loading画面を非表示にする
-// function hideLoadingScreen() {
-//     document.getElementById("load").style.display = "none";
-// }
-  
-// // ページの読み込みが完了したらloading画面を非表示にする
-// window.addEventListener("load", function() {
-//     // ロードが完了した時間を取得
-//     var loadEndTime = new Date().getTime();
-  
-//     // loading画面を非表示にする
-//     hideLoadingScreen();
-  
-//     // loading画面の表示時間を設定
-//     var loadingTime = loadEndTime - loadStartTime;
-//     var delayTime = loadingTime < 2000 ? 2000 - loadingTime : 0;
-  
-//     // 1秒後にloading画面を非表示にする
-//     setTimeout(function() {
-//         hideLoadingFadeScreen();
-//     }, 1000 + delayTime);
-// });
-  
-// // loading画面を表示する
-// function showLoadingScreen() {
-//     document.getElementById("load").style.display = "flex";
-// }
-  
-// // fade画面を表示する
-// function showLoadingFadeScreen() {
-//     document.getElementById("fadeout").style.display = "flex";
-// }
-
-// // メインページを非表示にする
-// document.documentElement.style.display = "none";
-
-// // 2秒後にメインページを表示する
-// setTimeout(function() {
-//     // メインページを表示する
-//     document.documentElement.style.display = "block";
-  
-//     // loading画面を非表示にする
-//     hideLoadingScreen();
-  
-//     // fade画面を表示する
-//     showLoadingFadeScreen();
-// }, 2000);
-
-// // ロード開始時間を取得する
-// var loadStartTime = new Date().getTime();
-
-// // loading画面を表示する
-// showLoadingScreen();
-
-
-  
